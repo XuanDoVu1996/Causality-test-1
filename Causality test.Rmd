@@ -27,7 +27,7 @@ The data are created based on the paper “Rejections Are More Contagious than C
 
 <img src="images/livestream.jpg" alt="Livestream" width="300"/>
 
-\newpage
+<P style="page-break-before: always">
 
 # Introduction
 
@@ -35,7 +35,7 @@ Our objective is to examine the impact of message framing on customers' inclinat
 
 In this investigation, the researchers collaborated with a social media influencer boasting millions of followers to conduct a real-world experiment. Specifically, within an ongoing live streaming event, the influencer showcased two insulated water bottles for children to the audience. Participants were randomly divided into two groups. In one group, viewers were informed that an acquaintance of the influencer had selected one bottle (referred to as the choice frame condition). In the other group, individuals were informed that an acquaintance of the influencer had rejected the alternative bottle (referred to as the rejection frame). The authors hypothesized that the rejection frame would heighten the likelihood of consumers adhering to the decision made by the influencer's friend, in contrast to the choice frame.
 
-\newpage
+<P style="page-break-before: always">
 
 # Data variable description
 
@@ -49,7 +49,7 @@ In this investigation, the researchers collaborated with a social media influenc
 
 
 
-\newpage
+<P style="page-break-before: always">
 
 # Required packages
 ```{r}
@@ -210,7 +210,7 @@ In our case, each viewer group watches only a livestream session having one of t
 
 5) Also, through a social media live-streaming event, it isn't easy to mimic real-world scenarios. It is also challenging to ensure independence within groups between observations. Since respondents can view the choices made by others, there is a chance that they are affected by choices made by others. Thus, it threatens the external validity, which make it difficult to generalize to other scenarios.
 
-\newpage
+<P style="page-break-before: always">
 
 # Reference
 
