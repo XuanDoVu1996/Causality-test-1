@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Causality test - Livestream case study</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Causality test_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Causality test_files/libs/quarto-html/quarto.js"></script>
+<script src="Causality test_files/libs/quarto-html/popper.min.js"></script>
+<script src="Causality test_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Causality test_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Causality test_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Causality test_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Causality test_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Causality test_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Causality test_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#general-information" id="toc-general-information" class="nav-link active" data-scroll-target="#general-information">General information</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#data-variable-description" id="toc-data-variable-description" class="nav-link" data-scroll-target="#data-variable-description">Data variable description</a></li>
+  <li><a href="#required-packages" id="toc-required-packages" class="nav-link" data-scroll-target="#required-packages">Required packages</a></li>
+  <li><a href="#data-preprocessing-and-exploration" id="toc-data-preprocessing-and-exploration" class="nav-link" data-scroll-target="#data-preprocessing-and-exploration">1) Data preprocessing and exploration</a>
+  <ul class="collapse">
+  <li><a href="#a-data-structure-and-type" id="toc-a-data-structure-and-type" class="nav-link" data-scroll-target="#a-data-structure-and-type">a) Data structure and type</a></li>
+  <li><a href="#b-missing-values" id="toc-b-missing-values" class="nav-link" data-scroll-target="#b-missing-values">b) Missing values</a></li>
+  <li><a href="#c-descriptive-statistics" id="toc-c-descriptive-statistics" class="nav-link" data-scroll-target="#c-descriptive-statistics">c) Descriptive statistics</a></li>
+  <li><a href="#d-data-transformation" id="toc-d-data-transformation" class="nav-link" data-scroll-target="#d-data-transformation">d) Data transformation</a></li>
+  <li><a href="#e-visulization-and-data-analysis" id="toc-e-visulization-and-data-analysis" class="nav-link" data-scroll-target="#e-visulization-and-data-analysis">e) Visulization and data analysis</a></li>
+  </ul></li>
+  <li><a href="#comparing-the-conformity-probabilities---hypothesis-testing" id="toc-comparing-the-conformity-probabilities---hypothesis-testing" class="nav-link" data-scroll-target="#comparing-the-conformity-probabilities---hypothesis-testing">2) Comparing the conformity probabilities - Hypothesis testing</a></li>
+  <li><a href="#challenges-when-measuring-the-average-causal-effect" id="toc-challenges-when-measuring-the-average-causal-effect" class="nav-link" data-scroll-target="#challenges-when-measuring-the-average-causal-effect">3) Challenges when measuring the average causal effect</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Causality test - Livestream case study</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="general-information" class="level1">
+<h1>General information</h1>
+<p>Git-hub repository at: https://github.com/XuanDoVu1996/Causality-test-1.git</p>
+<ul>
+<li>Rmarkdown: <strong>Causality test.Qmd</strong></li>
+<li>data set: <strong>datasets</strong>.csv</li>
+</ul>
+<p>The data are created based on the paper “Rejections Are More Contagious than Choices: How Another’s Decisions Shape Our Own” by Nan, L. X., Park, S. K., &amp; Yang, Y. (2023) published by Journal of Consumer Research.</p>
+<ul>
+<li>case study: https://doi.org/10.1093/jcr/ucad007</li>
+</ul>
+<p><img src="images/livestream.jpg" alt="Livestream" width="300"></p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Our objective is to examine the impact of message framing on customers’ inclination to adhere to someone else’s decision.</p>
+<p>In this investigation, the researchers collaborated with a social media influencer boasting millions of followers to conduct a real-world experiment. Specifically, within an ongoing live streaming event, the influencer showcased two insulated water bottles for children to the audience. Participants were randomly divided into two groups. In one group, viewers were informed that an acquaintance of the influencer had selected one bottle (referred to as the choice frame condition). In the other group, individuals were informed that an acquaintance of the influencer had rejected the alternative bottle (referred to as the rejection frame). The authors hypothesized that the rejection frame would heighten the likelihood of consumers adhering to the decision made by the influencer’s friend, in contrast to the choice frame.</p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="data-variable-description" class="level1">
+<h1>Data variable description</h1>
+<table class="table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 77%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ID</td>
+<td>Unique ID of the viewer</td>
+</tr>
+<tr class="even">
+<td>condition</td>
+<td>1 if viewer was in the choice frame condition, 2 if in the rejection frame condition</td>
+</tr>
+<tr class="odd">
+<td>conformity</td>
+<td>1 if the viewer did not conform to the friend’s decision, 2 otherwise</td>
+</tr>
+<tr class="even">
+<td>gender</td>
+<td>Gender of the viewer</td>
+</tr>
+<tr class="odd">
+<td>age</td>
+<td>Age of the viewer</td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="required-packages" class="level1">
+<h1>Required packages</h1>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DescTools)  <span class="co"># Tools for Descriptive Statistics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)     <span class="co"># to draw scatter plots</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)      <span class="co"># to wrangle data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)    <span class="co"># to draw different type of plots</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytex)    <span class="co"># to knit Rmarkdown</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)  <span class="co"># packages for data analysis</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ lubridate 1.9.3     ✔ tibble    3.2.1
+✔ purrr     1.0.2     ✔ tidyr     1.3.0
+✔ readr     2.1.4     </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jtools)     <span class="co"># Analysis and Presentation of Social Scientific Data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'jtools'
+
+The following object is masked from 'package:DescTools':
+
+    %nin%</code></pre>
+</div>
+</div>
+</section>
+<section id="data-preprocessing-and-exploration" class="level1">
+<h1>1) Data preprocessing and exploration</h1>
+<section id="a-data-structure-and-type" class="level2">
+<h2 class="anchored" data-anchor-id="a-data-structure-and-type">a) Data structure and type</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>framing <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"./datasets/framing.csv"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># observe the data</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(framing,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ID condition conformity gender age
+1  1         1          1   male  37
+2  2         1          1   male  37</code></pre>
+</div>
+</div>
+<p>Our data has 5 variables (“ID”,“condition”,“conformity”,“gender”,“age”) and 170 observations, which is considered a small dataset. All variables are in “integer” format except “gender”.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of observations: "</span>,<span class="fu">nrow</span>(framing),<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>) <span class="co"># number of observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of observations:  170 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of variables: "</span>,<span class="fu">ncol</span>(framing),<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)    <span class="co"># number of variables</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of variables:  5 </code></pre>
+</div>
+</div>
+</section>
+<section id="b-missing-values" class="level2">
+<h2 class="anchored" data-anchor-id="b-missing-values">b) Missing values</h2>
+<p>Generally, our data is clean and does not have many missing values, except for the “gender” variable with 8 “NA” values. Missing data might cause sampling bias and give us unrepresentative sample (Pritha, 2023), which affects the quality of statistical inference (Dong &amp; Peng, 2013). There is no universal rule for the acceptable proportion of missing data, but a missing rate of 5% or less is inconsequential (Schafer, 1999) and more than 10% will give bias in statistical analysis (Bennett, 2001). As our missing rate is only 4.7%, we apply list-wise deletion to remove those 8 observations without affecting further analysis too much.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st"> Number of missing values per columns: </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Number of missing values per columns: </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(framing))             <span class="co"># count number of NAs per each column</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        ID  condition conformity     gender        age 
+         0          0          0          8          0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>framing <span class="ot">&lt;-</span> framing <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()    <span class="co"># list-wise deletion</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="c-descriptive-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="c-descriptive-statistics">c) Descriptive statistics</h2>
+<p>As age must be positive, we drop the observation having negative value of “age” (only one observation having age -1).</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st"> Descriptive statistics before handling incorrect information:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Descriptive statistics before handling incorrect information:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(framing)                       <span class="co"># before summary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       ID           condition       conformity       gender         
+ Min.   :  1.00   Min.   :1.000   Min.   :1.000   Length:162        
+ 1st Qu.: 44.25   1st Qu.:1.000   1st Qu.:1.000   Class :character  
+ Median : 85.50   Median :1.000   Median :1.000   Mode  :character  
+ Mean   : 85.66   Mean   :1.481   Mean   :1.302                     
+ 3rd Qu.:127.75   3rd Qu.:2.000   3rd Qu.:2.000                     
+ Max.   :170.00   Max.   :2.000   Max.   :2.000                     
+      age       
+ Min.   :-1.00  
+ 1st Qu.:25.25  
+ Median :34.50  
+ Mean   :34.54  
+ 3rd Qu.:42.75  
+ Max.   :60.00  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>framing <span class="ot">&lt;-</span> framing[framing<span class="sc">$</span>age <span class="sc">&gt;</span><span class="dv">0</span>, ]   <span class="co"># remove negative age</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st"> Descriptive statistics after handling incorrect information:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Descriptive statistics after handling incorrect information:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(framing)                       <span class="co"># after summary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       ID           condition       conformity       gender         
+ Min.   :  1.00   Min.   :1.000   Min.   :1.000   Length:161        
+ 1st Qu.: 45.00   1st Qu.:1.000   1st Qu.:1.000   Class :character  
+ Median : 86.00   Median :1.000   Median :1.000   Mode  :character  
+ Mean   : 86.09   Mean   :1.484   Mean   :1.304                     
+ 3rd Qu.:128.00   3rd Qu.:2.000   3rd Qu.:2.000                     
+ Max.   :170.00   Max.   :2.000   Max.   :2.000                     
+      age       
+ Min.   :18.00  
+ 1st Qu.:26.00  
+ Median :35.00  
+ Mean   :34.76  
+ 3rd Qu.:43.00  
+ Max.   :60.00  </code></pre>
+</div>
+</div>
+</section>
+<section id="d-data-transformation" class="level2">
+<h2 class="anchored" data-anchor-id="d-data-transformation">d) Data transformation</h2>
+<p>To observe the variables in different categories, we convert the binary categorical variables (“conformity”, “gender” and “condition”) and continuous variable “age” to factors, in which “age” is categorized into 6 levels.</p>
+<p>Our final data frame has 161 observations and 5 variables. We have two conditions (Rejection frame and Choice frame), and two outcomes conformity or non-conformity, three genders, and six levels of age.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st"> Data type before: </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Data type before: </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">lapply</span>(<span class="at">X=</span>framing, <span class="at">FUN =</span> class))                 <span class="co"># check data type</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     ID        condition conformity gender      age      
+[1,] "integer" "integer" "integer"  "character" "integer"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>framing[,<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(framing[,<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>], as.factor) <span class="co"># convert to factors</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>framing<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">cut</span>(framing<span class="sc">$</span>age,                   <span class="co"># convert age to range of age</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">25</span>, <span class="dv">35</span>, <span class="dv">45</span>, <span class="dv">55</span>, <span class="dv">60</span>, <span class="cn">Inf</span>), </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"15-25"</span>, <span class="st">"26-35"</span>, <span class="st">"36-45"</span>, <span class="st">"46-55"</span>, <span class="st">"56-60"</span>,<span class="st">"60+"</span>))</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st"> Data type after: </span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Data type after: </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(<span class="fu">lapply</span>(<span class="at">X=</span>framing, <span class="at">FUN =</span> class))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     ID        condition conformity gender   age     
+[1,] "integer" "factor"  "factor"   "factor" "factor"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(framing, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ID condition conformity gender   age
+1  1         1          1   male 36-45
+2  2         1          1   male 36-45</code></pre>
+</div>
+</div>
+</section>
+<section id="e-visulization-and-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="e-visulization-and-data-analysis">e) Visulization and data analysis</h2>
+<p>From Figure 1.1, we observed that male viewers dominated our observations (63.5%) compared to female viewers (33.5%) and others (only 3%). From Figure 1.2, we see that the proportion of viewers confirming the friend’s decision is quite low (30.4%). Most of our viewers are relatively young (82% less than 45 years old). The two frame groups have relatively similar numbers of viewers and the distribution of gender. However, the choice frame group has lower probability of conform (23% compared to 38% of rejection frame) and slightly different age distribution.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>))   <span class="co"># divide the frame into grid for multiple plots</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the conformity probability per each frame condition</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>conformity <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(<span class="fu">table</span>(framing<span class="sc">$</span>condition,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                               framing<span class="sc">$</span>conformity),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(conformity) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Choice Frame"</span>, <span class="st">"Rejection Frame"</span>)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(conformity) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Not conform"</span>,<span class="st">"Conform"</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>conformity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 
+                  Not conform   Conform
+  Choice Frame      0.7710843 0.2289157
+  Rejection Frame   0.6153846 0.3846154</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1.1</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="fu">table</span>(framing<span class="sc">$</span>condition, framing<span class="sc">$</span>gender),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">names.arg =</span> <span class="fu">c</span>(<span class="st">"Female"</span>,<span class="st">"Male"</span>,<span class="st">"Others"</span>),          </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Fig 1.1: Number of viewers per Gender and Framing Condition"</span>,         <span class="at">xlab =</span> <span class="st">"Type of gender"</span>,                 </span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Number of the viewers"</span>) </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Add legend based on "condition"</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,<span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Reject Frame Condition"</span>,<span class="st">"Choice Frame Condition"</span>),</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"grey"</span>, <span class="st">"black"</span>))</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1.2</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="fu">table</span>(framing<span class="sc">$</span>condition, framing<span class="sc">$</span>conformity),</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">names.arg =</span> <span class="fu">c</span>(<span class="st">"Not conformed"</span>,<span class="st">"Conformed"</span>),          </span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Fig 1.2: Number of viewers per Conformity and Framing Condition"</span>,         </span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Type of conformity"</span>,                 </span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Number of the viewers"</span>)</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Add legend based on "condition"</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,<span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Reject Frame Condition"</span>,<span class="st">"Choice Frame Condition"</span>),</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"grey"</span>, <span class="st">"black"</span>))</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1.3</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="fu">table</span>(framing<span class="sc">$</span>condition, framing<span class="sc">$</span>age),</span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">names.arg =</span> <span class="fu">c</span>(<span class="st">"15-25"</span>,<span class="st">"26-35"</span>,<span class="st">"36-45"</span>,</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"46-55"</span>,<span class="st">"56-60"</span>,<span class="st">"60+"</span>),          </span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Fig 1.3: Number of viewers per Age and Framing Condition"</span>,</span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Type of Age"</span>,                 </span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Number of the viewers"</span>)</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Add legend based on "condition"</span></span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,<span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Reject Frame Condition"</span>,<span class="st">"Choice Frame Condition"</span>),</span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"grey"</span>, <span class="st">"black"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Causality-test_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="comparing-the-conformity-probabilities---hypothesis-testing" class="level1">
+<h1>2) Comparing the conformity probabilities - Hypothesis testing</h1>
+<p>As mentioned in part 1, the choice frame has noticeably lower probability of conformity than that of the rejection group. This difference in probability gives us a signal that the exposure to different framing conditions affected customers’ tendency to comply with another person’s decision. In our case, the first insulated bottle is chosen more by viewers if the friend rejects another bottle than if the friend chooses the first one. Our observation is like the experiment result in the study, which is not surprising because we only remove few observations having missing values. However, the significance levels of the result might be different. Thus, we will do statistical hypothesis testing to verify this presumption.</p>
+<p>We determine the hypothesis as follows:</p>
+<p><strong>“H1: Consumers are more likely to conform to another’s decision if they perceive the decision as a rejection than if they perceive it as a choice.”</strong> (Nan et al., 2023)</p>
+<p>Nan et al.&nbsp;(2023) noted that there are uncontrollable factors in this type of study (no control over who participates or when viewers participate). The first factor might distort our result if the two groups of viewers are systematically different (not comparable). Indeed, as mentioned in part 1, two groups of viewers have slightly different age distribution, which makes age being a potential confounder. In addition, if the viewer joins the livestream after the streamer talks about the framing conditions, our framing conditions might not make any effect. Thus, in our study, we assume that the participants were randomly assigned to the choice and rejection frames for this test. We also assume that the observations are independent of each other within and between the groups. This means that for a particular individual, their choice is unaffected by the choice of others in their group, and neither should their choice be affected by the choice of others in an external group.</p>
+<p>Next, we formulate statistical hypotheses:</p>
+<p><strong>• (H0): There is no association between framing condition and conformity.</strong><br>
+<strong>• (HA): There is a significant association between framing conditions and conformity.</strong></p>
+<p>We have two categorical variables (“condition” and “conformity”). Thus, we use the chi-squared test for the independence of the two variables (Shaun, 2022), which will allow us to test whether the condition and conformity variables are related or not. This testing would allow us to confidently claim whether our result is merely by chance or caused by the exposure to different frame conditions. Accordingly, we can conclude whether the probabilities of conformity might be due to the different framing conditions or not.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Performing the chi squared test to see if the level of </span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co">#conformity depends upon the condition to which they were exposed.</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>table_result <span class="ot">&lt;-</span> <span class="fu">table</span>(framing<span class="sc">$</span>condition,framing<span class="sc">$</span>conformity)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>chi_squared_test <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(table_result)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(chi_squared_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's Chi-squared test with Yates' continuity correction
+
+data:  table_result
+X-squared = 3.8982, df = 1, p-value = 0.04834</code></pre>
+</div>
+</div>
+<p>Our chosen significance level is 95%, and the p-value for our test was 0.048 (less than 0.05). Thus, we can reject the null hypothesis. In other words, we are confident that there is a significant association between framing conditions and conformity levels. In conclusion, our significant level is lower than the p-value of the study at 7.1%. However, it does not change the fact that there is a signal of the effect of framing conditions on the conformity probability.</p>
+</section>
+<section id="challenges-when-measuring-the-average-causal-effect" class="level1">
+<h1>3) Challenges when measuring the average causal effect</h1>
+<p>Causal effect of a binary treatment is defined as the difference between two potential outcomes (with and without the treatment) (Imai, 2018). In addition, an average causal effect (ATE) is defined as the average difference between potential outcomes under different treatment (Schafer &amp; Kang, 2008). As we can’t observe the counterfactuals, the gold standard of classical experiment (randomized controlled trials) is usually preferred with the difference-in-difference estimators to estimate the average causal effect. The randomization guarantees the average outcome between two groups are solely attributed to the treatment, while DiD address the confounding bias due to time trends (Imai, 2018).</p>
+<p>In our case, each viewer group watches only a livestream session having one of two framing conditions. From our understanding, in the experiment of Nan et al.&nbsp;(2023), the choice frame is implemented before one lucky draw in a livestream session, while the rejection frame is implemented before the lucky draw of the other livestream session. The two livestream sessions happen in sequential order. Given the above experiment design, the following problems would arise:</p>
+<ol type="1">
+<li><p>In our case, a confounding variable may come into play. Simply measuring group differences simultaneously for two groups without measuring treatment effects over time can fail to address the systematic differences in two groups caused by the time varying confounders. For example, the credibility or attractiveness of the brand of bottles used and the influencer might vary significantly between two livestream sessions. Another type of confounders is the different characteristics of two viewer groups (the age distribution) might affect our result.</p></li>
+<li><p>Another type of confounders is the different characteristics of two viewer groups (the age distribution) might affect our result. As the study tries to randomly assign viewers into two groups, the selection bias (viewers self-select themselves into different groups) might be mitigated. Indeed, the two groups have similar gender distribution and slightly different age distribution. However, since the groups are experimented on at different times in the study, there might be differences in the latent (unobservable) characteristics of these two groups such as different types of viewers having different time using social media. Thus, there could be a selection bias that we fail to account for.</p></li>
+<li><p>Temporal ordering technically does not exist for us here. We don’t test a group before and after treatment, but we measure the difference between two groups exposed to different conditions. This can put a question mark on the cause-and-effect relationship.</p></li>
+<li><p>This study also mentioned that the researchers could not control the time the participants joined. So, if certain participants joined after the framing announcement and still voted, the effect size of the conformity level could be underestimated.</p></li>
+<li><p>Also, through a social media live-streaming event, it isn’t easy to mimic real-world scenarios. It is also challenging to ensure independence within groups between observations. Since respondents can view the choices made by others, there is a chance that they are affected by choices made by others. Thus, it threatens the external validity, which make it difficult to generalize to other scenarios.</p></li>
+</ol>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="reference" class="level1">
+<h1>Reference</h1>
+<p>Bennett DA. How can I deal with missing data in my study? Aust N Z J Public Health. 2001;25(5):464–469.</p>
+<p>Dong, Y., Peng, CY.J. Principled missing data methods for researchers. SpringerPlus 2, 222 (2013). https://doi.org/10.1186/2193-1801-2-222</p>
+<p>Nan, L. X., Park, S. K., Yang, Y. (2023). Rejections Are More Contagious than Choices: How Another’s Decisions Shape Our Own. Journal of Consumer Research, 50(2), 363–381. https://doi.org/10.1093/jcr/ucad007</p>
+<p>Imai, K., (2018). Quantitative Social Science: An Introduction. https://press.princeton.edu/books/paperback/9780691175461/quantitative-social-science</p>
+<p>Pritha, B. (2023). Missing Data | Types, Explanation, &amp; Imputation. Retrieved from: https://www.scribbr.com/statistics/missing-data/</p>
+<p>Schafer J., L. (1999). Multiple imputation: a primer. Stat Methods in Med, 8(1), 3–15. 10.1191/096228099671525676.</p>
+<p>Schafer, J. L., &amp; Kang, J. (2008). Average causal effects from nonrandomized studies: A practical guide and simulated example. Psychological Methods, 13(4), 279–313. https://doi.org/10.1037/a0014268</p>
+<p>Shaun, T. (2022). Chi-Square (Χ²) Tests | Types, Formula &amp; Examples. Retrieved from: https://www.scribbr.com/statistics/chi-square-tests/</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
