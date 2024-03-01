@@ -4,7 +4,7 @@
 Git-hub repository at:
 https://github.com/XuanDoVu1996/Causality-test-1.git
 
-- Rmarkdown: **Causality test.Rmd**
+- Markdown: **Causality test.Qmd**
 - data set: **datasets\framing.csv**
 
 The data are created based on the paper “Rejections Are More Contagious than Choices: How Another’s Decisions Shape Our Own” by Nan, L. X., Park, S. K., & Yang, Y. (2023) published by Journal of Consumer Research. 
